@@ -1,0 +1,36 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: nodejs-trigger-template
+  namespace: contact-walid-labidi-dev
+spec:
+  params:
+    - name: git-repo-url
+      description: The git repository URL
+      default: https://github.com/WalidLabidi001/nodejs-ex.git
+    - name: git-revision
+      description: The git branch to build
+      default: master
+    - name: APP
+      description: Application name
+      default: nodejs-ex
+    - name: BC
+      description: BuildConfig name
+      default: nodejs-ex
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: nodejs-pipeline-run-
+      spec:
+        pipelineRef:
+          name: s2i-build-deploy
+        params:
+          - name: APP
+            value: $(tt.params.APP)
+          - name: BC
+            value: $(tt.params.BC)
+        workspaces:
+          - name: shared-data
+            emptyDir: {}
+
